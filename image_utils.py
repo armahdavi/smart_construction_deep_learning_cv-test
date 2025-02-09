@@ -128,6 +128,41 @@ def ten_crop(image, crop_ratio=0.8):
     return resized_crops + flipped_crops
 
 
+def augment_dataset(images, labels, classes_to_augment, crop_ratio = 0.8):
+    '''
+    Description
+    ----------
+    Function to augment the dataset by applying ten-crop augmentation to specific classes 
+    (good for imbalanced classes where data augmentation should be run over only those classes)
+    
+    Parameters
+    ----------
+    images : np array of image (RGB)
+    labels : np array of labels (strings or integer)
+    classes_to_augment : list of classes where augmentation is implemented
+    crop_ratio : float number of the crop ratio (default = 0.8)
+        
+    Returns
+    -------
+    Augmented arrays of images and labels
+    '''
+    
+    augmented_images, augmented_labels = [], [] # List to store the augmented images and labels
+    
+    for img, label in zip(images, labels):
+        if label in classes_to_augment:
+            # Apply ten-crop augmentation
+            crops = ten_crop(img, crop_ratio)
+            augmented_images.extend(crops)
+            augmented_labels.extend([label] * len(crops))
+        else:
+            # Keep images of other classes unchanged
+            augmented_images.append(img)
+            augmented_labels.append(label)
+    
+    return np.array(augmented_images), np.array(augmented_labels)
+
+
 def shuffle_data(X, y):
     '''
     Description
